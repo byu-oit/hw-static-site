@@ -1,5 +1,5 @@
 # hw-static-site
-Example of creating and deploying an API with Docker and Terraform on AWS.
+Example of creating and deploying a Static Website with S3 and Terraform on AWS.
 
 ## Prerequisites
 
@@ -45,7 +45,22 @@ terraform init
 terraform apply
 ```
 
-In the AWS Console, see if you can find the resources from `setup.tf` (ECR, SSM Param).
+The output from this will give you the NS records for your new Hosted Zone. These NS records need to be entered into the DNS system of record for the parent domain.
+
+For example, if your site's URL was `mysite-dev.byu.edu`, you would need to add the following records to QIP (as QIP is the DNS system of record for `byu.edu`):
+
+```
+mysite-dev.byu.edu NS ns-1486.awsdns-57.org
+mysite-dev.byu.edu NS ns-1853.awsdns-39.co.uk
+mysite-dev.byu.edu NS ns-829.awsdns-39.net
+mysite-dev.byu.edu NS ns-91.awsdns-11.com
+```
+
+(You'll need to change the actual values based on the output from `terraform apply`)
+
+As another example, if your site's URL was `mysite-dev.mydepartment.byu.edu`, and `mydepartment.byu.edu` was already controlled by a Route 53 Hosted Zone, you would manually add the NS records to the Hosted Zone for `mydepartment.byu.edu`.
+
+In the AWS Console, see if you can find the resources from `setup.tf` (Route 53 Hosted Zone).
 
 ### Enable GitHub Actions on your repo
 
@@ -55,50 +70,40 @@ In the AWS Console, see if you can find the resources from `setup.tf` (ECR, SSM 
 If you look at `.github/workflows/pipeline-workflow.yml`, you'll see that it is setup to run on pushes to the dev branch. Because you have already pushed to the dev branch, this workflow should be running now.
 
 * In GitHub, click on the workflow run (it has the same name as the last commit message you pushed)
-* Click on the `Build and deploy Fargate API to dev` job
+* Click on the `Build and deploy Webapp to S3` job
 * Expand any of the steps to see what they are doing
 
 ### View the deployed application
 
-Anytime after the `Terraform Apply` step succeeds:
+Anytime after the `Terraform Apply` step succeeds   :
 ```
 cd ../app/
 terraform init
 terraform output
 ```
 
-This will output a DNS Name. Enter this in a browser. It will probably return `503 Service Unavailable`. It takes some time for the ECS Tasks to spin up and for the ALB to recognize that they are healthy.
+This will output a DNS Name. Enter this in a browser. It will probably return an error. This is because your content hasn't been uploaded yet, or the CloudFront distribution hasn't been updated.
 
-In the AWS Console, see if you can find the ECS Service and see the state of its ECS Tasks. Also see if you can find the ALB Target Group, and notice when Tasks are added to it.
+Wait for the `Invalidate CloudFront cache` step to succeed, then try again.
 
-> Note:
-> 
-> While Terraform creates the ECS Service, it doesn't actually spin up any ECS Tasks. This isn't Terraform's job. The ECS Service is responsible for ensuring that ECS Tasks are running.
-> 
-> Because of this, if the ECS Tasks fail to launch (due to bugs in the code causing the docker container to crash, for example), Terraform won't know anything about that. From Terraform's perspective, the deployment was successful.
-> 
-> These type of issues can often be tracked down by finding the Stopped ECS Tasks in the ECS Console, and looking at their logs or their container status.
-
-Once the Tasks are running, you should be able to hit the app's URL and get a JSON response. Between `index.js` and `main.tf`, can you find what pieces are necessary to make this data available to the app?
-
-In the AWS Console, see if you can find the other resources from `main.tf`.
+In the AWS Console, see if you can find the other resources from `main.tf` (S3 Bucket, CloudFront Distribution).
 
 ### Push a change to your application
 
-Make a small change to `index.js` (try adding a `console.log`, a simple key/value pair to the JSON response, or a new path). Commit and push this change to the `dev` branch.
+Make a small change to `index.html`. Commit and push this change to the `dev` branch.
 
 ```
 git commit -am "try deploying a change"
 git push
 ```
 
-In GitHub Actions, watch the deploy steps run (you have a new push, so you'll have to go back and select the new workflow run instance and the job again). Once it gets to the CodeDeploy step, you can watch the deploy happen in the CodeDeploy console in AWS. Once CodeDeploy says that production traffic has been switched over, hit your application in the browser and see if your change worked. If the service is broken, look at the stopped ECS Tasks in the ECS Console to see if you can figure out why.
+In GitHub Actions, watch the deploy steps run (you have a new push, so you'll have to go back and select the new workflow run instance and the job again). Once the `Invalidate CloudFront cache` step succeeds, hit your application in the browser and see if your change worked.
 
 > Note: 
 >
 > It's always best to test your changes locally before pushing to GitHub and AWS. Testing locally will significantly increase your productivity as you won't be constantly waiting for GitHub Actions and CodeDeploy to deploy, just to discover bugs.
 >
-> You can either test locally inside Docker, or with Node directly on your computer. Whichever method you choose, you'll have to setup the environment variables that ECS makes available to your code when it runs in AWS. You can find these environment variables in `index.js` and `main.tf`.
+> You can either test locally inside Docker, or by pointing your browser directly at your local files.
 
 ## Learn what was built
 
