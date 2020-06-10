@@ -30,9 +30,5 @@ output "hosted_zone_name_servers" {
 }
 
 output "note" {
-  value = <<-EOF
-  These name servers records need to be manually added to the parent DNS authority (probably QIP or Route 53)
-  Something like:
-    ${module.setup.hosted_zone.name} NS [${module.setup.hosted_zone.name_servers}]
-  EOF
+  value = "These NS records need to be manually added to the parent DNS authority (probably QIP or Route 53)."
 }
