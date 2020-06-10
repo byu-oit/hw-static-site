@@ -1,4 +1,4 @@
-# hello-world-api
+# hw-static-site
 Example of creating and deploying an API with Docker and Terraform on AWS.
 
 ## Prerequisites
@@ -9,7 +9,7 @@ Example of creating and deploying an API with Docker and Terraform on AWS.
 * Ensure your account has a [Terraform State S3 Backend](https://github.com/byu-oit/terraform-aws-backend-s3) deployed.
 
 ## Setup
-* Create a new repo [using this template](https://github.com/byu-oit/hello-world-api/generate).
+* Create a new repo [using this template](https://github.com/byu-oit/hw-static-site/generate).
 
   You need your own repo so that you can push changes and have CodePipeline deploy them.
   
@@ -26,7 +26,7 @@ git checkout -b dev
 ```
 * Find and replace across the repo:
   * replace `<account_number>` with your AWS account number, using your `dev` account in `/terraform-iac/dev` and your `prd` account in `/terraform-iac/prd`
-  * replace `hello-world-api` with the name of your repo
+  * replace `hw-static-site` with the name of your repo
   * replace `byu-oit-terraform-dev` with the name of your `dev` AWS account
   * replace `byu-oit-terraform-prd` with the name of your `prd` AWS account
 * Commit/push your changes
