@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     bucket         = "terraform-state-storage-<account_number>"
     dynamodb_table = "terraform-state-lock-<account_number>"
-    key            = "hello-world-api-dev/setup.tfstate"
+    key            = "hw-static-site-dev/setup.tfstate"
     region         = "us-west-2"
   }
 }
@@ -12,13 +12,27 @@ provider "aws" {
   region  = "us-west-2"
 }
 
-variable "some_secret" {
-  type        = string
-  description = "Some secret string that will be stored in SSM and mounted into the Fargate Tasks as an environment variable"
+module "setup" {
+  source = "../../modules/setup/"
+  env    = "dev"
 }
 
-module "setup" {
-  source      = "../../modules/setup/"
-  env         = "dev"
-  some_secret = var.some_secret
+output "hosted_zone_id" {
+  value = module.setup.hosted_zone.zone_id
+}
+
+output "hosted_zone_name" {
+  value = module.setup.hosted_zone.name
+}
+
+output "hosted_zone_name_servers" {
+  value = module.setup.hosted_zone.name_servers
+}
+
+output "note" {
+  value = <<-EOF
+  These name servers records need to be manually added to the parent DNS authority (probably QIP or Route 53)
+  Something like:
+    ${module.setup.hosted_zone.name} NS [${module.setup.hosted_zone.name_servers}]
+  EOF
 }
