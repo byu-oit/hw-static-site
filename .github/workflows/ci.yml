@@ -29,6 +29,7 @@ jobs:
               }
             ]
           }'
+          echo "matrix is $matrix"
           echo "::set-env name=matrix::$matrix"
 
       - name: Setup PRD Environment Variables
