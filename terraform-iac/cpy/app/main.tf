@@ -1,9 +1,9 @@
 terraform {
-  required_version = "0.12.26" # must match value in .github/workflows/*.yml
+  required_version = "0.12.26"
   backend "s3" {
-    bucket         = "terraform-state-storage-977306314792"
-    dynamodb_table = "terraform-state-lock-977306314792"
-    key            = "hw-static-site-dev/app.tfstate"
+    bucket         = "terraform-state-storage-539738229445"
+    dynamodb_table = "terraform-state-lock-539738229445"
+    key            = "hw-static-site-cpy/app.tfstate"
     region         = "us-west-2"
   }
 }
@@ -15,7 +15,7 @@ provider "aws" {
 
 module "app" {
   source = "../../modules/app/"
-  env    = "dev"
+  env    = "cpy"
 }
 
 output "s3_bucket" {

@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket         = "terraform-state-storage-539738229445"
-    dynamodb_table = "terraform-state-lock-539738229445"
-    key            = "hw-static-site-prd/setup.tfstate"
+    bucket         = "terraform-state-storage-977306314792"
+    dynamodb_table = "terraform-state-lock-977306314792"
+    key            = "hw-static-site-stg/setup.tfstate"
     region         = "us-west-2"
   }
 }
@@ -14,7 +14,7 @@ provider "aws" {
 
 module "setup" {
   source = "../../modules/setup/"
-  env    = "prd"
+  env    = "stg"
 }
 
 output "hosted_zone_id" {
