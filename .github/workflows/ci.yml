@@ -18,9 +18,9 @@ jobs:
           matrix='{
             "env":[
               {
+                "tf_working_dir":"./terraform-iac/dev/app",
                 "aws_key_name":"byu_oit_terraform_dev_key",
-                "aws_secret_name":"byu_oit_terraform_dev_secret",
-                "tf_working_dir":"./terraform-iac/dev/app"
+                "aws_secret_name":"byu_oit_terraform_dev_secret"
               }
             ]
           }'
@@ -32,9 +32,9 @@ jobs:
           matrix='{
             "env":[
               {
+                "tf_working_dir":"./terraform-iac/stg/app",
                 "aws_key_name":"byu_oit_terraform_dev_key",
-                "aws_secret_name":"byu_oit_terraform_dev_secret",
-                "tf_working_dir":"./terraform-iac/stg/app"
+                "aws_secret_name":"byu_oit_terraform_dev_secret"
               }
             ]
           }'
@@ -46,14 +46,14 @@ jobs:
           matrix='{
             "env":[
               {
+                "tf_working_dir":"./terraform-iac/prd/app",
                 "aws_key_name":"byu_oit_terraform_prd_key",
-                "aws_secret_name":"byu_oit_terraform_prd_secret",
-                "tf_working_dir":"./terraform-iac/prd/app"
+                "aws_secret_name":"byu_oit_terraform_prd_secret"
               },
               {
+                "tf_working_dir":"./terraform-iac/cpy/app",
                 "aws_key_name":"byu_oit_terraform_prd_key",
-                "aws_secret_name":"byu_oit_terraform_prd_secret",
-                "tf_working_dir":"./terraform-iac/cpy/app"
+                "aws_secret_name":"byu_oit_terraform_prd_secret"
               }
             ]
           }'
