@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup DEV Environment Variables
-        if: github.base_ref == 'dev'
+        if: github.ref == 'refs/heads/dev'
         run: |
           matrix='{
             "env":[
@@ -30,7 +30,7 @@ jobs:
           echo "::set-env name=matrix::`echo $matrix | jq -c .`"
 
       - name: Setup STG Environment Variables
-        if: github.base_ref == 'stg'
+        if: github.ref == 'refs/heads/stg'
         run: |
           matrix='{
             "env":[
@@ -48,7 +48,7 @@ jobs:
           echo "::set-env name=matrix::`echo $matrix | jq -c .`"
 
       - name: Setup PRD/CPY Environment Variables
-        if: github.base_ref == 'master'
+        if: github.ref == 'refs/heads/master'
         run: |
           matrix='{
             "env":[
