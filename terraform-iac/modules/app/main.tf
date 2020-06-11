@@ -3,11 +3,12 @@ variable "env" {
 }
 
 locals {
-  # These two lines form the URL for your website.
+  # These three lines form the URL for your website.
   # In real life, you should probably use a more human-friendly URL.
   # Something like, "mysite.byu.edu" for prd and "mysite-dev.byu.edu" for dev.
   subdomain = (var.env == "prd") ? "hw-static-site" : "hw-static-site-${var.env}"
-  url       = "${local.subdomain}.byu-oit-terraform-dev.amazon.byu.edu"
+  parent    = (var.env == "prd" || var.env == "cpy") ? "byu-oit-terraform-prd.amazon.byu.edu" : "byu-oit-terraform-dev.amazon.byu.edu"
+  url       = "${local.subdomain}.${local.parent}"
 
   tags = {
     env              = "${var.env}"
