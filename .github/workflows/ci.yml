@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [dev, master]
+    branches: [dev, stg, master]
     types: [opened, reopened, synchronize, edited]
 env:
   tf_version: "0.12.26" # must match value in terraform-iac/*/app/main.tf
