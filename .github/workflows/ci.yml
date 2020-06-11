@@ -78,6 +78,6 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        working-directory: ${{ needs.env.outputs.tf_working_dir }}
+        working-directory: ${{ matrix.tf_working_dir }}
         run: terraform plan -input=false
     # TODO: Post plan back to PR
