@@ -15,9 +15,21 @@ jobs:
       - name: Setup DEV Environment Variables
         if: github.base_ref == 'dev'
         run: |
-          echo "::set-env name=aws_key_name::byu_oit_terraform_dev_key"
-          echo "::set-env name=aws_secret_name::byu_oit_terraform_dev_secret"
-          echo "::set-env name=matrix::{\"tf_working_dir\":[\"./terraform-iac/dev/app\",\"./terraform-iac/stg/app\"]}"
+          matrix='{
+            "env":[
+              {
+                "aws_key_name":"byu_oit_terraform_dev_key",
+                "aws_secret_name":"byu_oit_terraform_dev_secret",
+                "tf_working_dir":"./terraform-iac/dev/app"
+              },
+              {
+                "aws_key_name":"byu_oit_terraform_stg_key",
+                "aws_secret_name":"byu_oit_terraform_stg_secret",
+                "tf_working_dir":"./terraform-iac/stg/app"
+              }
+            ]
+          }'
+          echo "::set-env name=matrix::$matrix"
 
       - name: Setup PRD Environment Variables
         if: github.base_ref == 'master'
@@ -27,9 +39,6 @@ jobs:
           echo "::set-env name=matrix::{\"tf_working_dir\":[\"./terraform-iac/prd/app\",\"./terraform-iac/cpy/app\"]}"
 
     outputs:
-      aws_key_name: ${{ env.aws_key_name }}
-      aws_secret_name: ${{ env.aws_secret_name }}
-      tf_working_dir: ${{ env.tf_working_dir }}
       matrix: ${{ env.matrix }}
 
   # TODO: Add jobs to build and test website code
@@ -64,8 +73,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets[needs.env.outputs.aws_key_name] }}
-          aws-secret-access-key: ${{ secrets[needs.env.outputs.aws_secret_name] }}
+          aws-access-key-id: ${{ secrets[matrix.env.aws_key_name] }}
+          aws-secret-access-key: ${{ secrets[matrix.env.aws_secret_name] }}
           aws-region: us-west-2
 
       - name: Terraform Setup
@@ -74,10 +83,10 @@ jobs:
           terraform_version: ${{ env.tf_version }}
 
       - name: Terraform Init
-        working-directory: ${{ matrix.tf_working_dir }}
+        working-directory: ${{ matrix.env.tf_working_dir }}
         run: terraform init
 
       - name: Terraform Plan
-        working-directory: ${{ matrix.tf_working_dir }}
+        working-directory: ${{ matrix.env.tf_working_dir }}
         run: terraform plan -input=false
     # TODO: Post plan back to PR
