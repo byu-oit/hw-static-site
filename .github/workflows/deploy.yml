@@ -56,7 +56,7 @@ jobs:
                 "tf_working_dir":"./terraform-iac/prd/app",
                 "aws_key_name":"byu_oit_terraform_prd_key",
                 "aws_secret_name":"byu_oit_terraform_prd_secret",
-                "rfc_key_name":"standard_change_sandbox_client_key",
+                "rfc_key_name":"standard_change_production_client_key",
                 "rfc_secret_name":"standard_change_production_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
                 "slack_channel":"#slack-bot-testing"
