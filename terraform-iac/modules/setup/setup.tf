@@ -3,7 +3,7 @@ variable "env" {
 }
 
 locals {
-  # These lines form the URL for your website.
+  # These three lines form the URL for your website.
   # In real life, you should probably use a more human-friendly URL.
   # Something like, "mysite.byu.edu" for prd and "mysite-dev.byu.edu" for dev.
   subdomain = (var.env == "prd") ? "hw-static-site" : "hw-static-site-${var.env}"
