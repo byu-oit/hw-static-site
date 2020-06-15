@@ -1,8 +1,8 @@
 terraform {
   required_version = "0.12.26" # must match value in .github/workflows/*.yml
   backend "s3" {
-    bucket         = "terraform-state-storage-<account_number>"
-    dynamodb_table = "terraform-state-lock-<account_number>"
+    bucket         = "terraform-state-storage-977306314792"
+    dynamodb_table = "terraform-state-lock-977306314792"
     key            = "hw-static-site-stg/app.tfstate"
     region         = "us-west-2"
   }

@@ -49,6 +49,10 @@ jobs:
 
       - name: Setup PRD/CPY Environment Variables
         if: github.ref == 'refs/heads/master'
+        # TODO: When prd really is production, in prd environment (first block below):
+        # * Change standard_change_sandbox_client_key to standard_change_production_client_key
+        # * Change standard_change_sandbox_client_secret to standard_change_production_client_secret
+        # You probably don't want to do this in cpy (second block), or you will get two RFCs everytime you push to master
         run: |
           matrix='{
             "env":[
@@ -56,8 +60,8 @@ jobs:
                 "tf_working_dir":"./terraform-iac/prd/app",
                 "aws_key_name":"byu_oit_terraform_prd_key",
                 "aws_secret_name":"byu_oit_terraform_prd_secret",
-                "rfc_key_name":"standard_change_production_client_key",
-                "rfc_secret_name":"standard_change_production_client_secret",
+                "rfc_key_name":"standard_change_sandbox_client_key",
+                "rfc_secret_name":"standard_change_sandbox_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
                 "slack_channel":"#slack-bot-testing"
               },
@@ -117,13 +121,14 @@ jobs:
         id: plan
         run: terraform plan -input=false -out=plan
 
-      - name: Start Standard Change
-        uses: byu-oit/github-action-start-standard-change@v1
-        id: start-standard-change
-        with:
-          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
-          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
-          template-id: ${{ matrix.env.rfc_template_id }}
+      # TODO: uncomment when ittest is fixed
+      # - name: Start Standard Change
+      #   uses: byu-oit/github-action-start-standard-change@v1
+      #   id: start-standard-change
+      #   with:
+      #     client-key: ${{ secrets[matrix.env.rfc_key_name] }}
+      #     client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
+      #     template-id: ${{ matrix.env.rfc_template_id }}
 
       - name: Terraform Apply
         working-directory: ${{ matrix.env.tf_working_dir }}
@@ -146,15 +151,16 @@ jobs:
       - name: Invalidate CloudFront cache
         run: aws cloudfront create-invalidation --path '/*' --distribution-id ${{ steps.cf_tf_outputs.outputs.stdout }}
 
-      - name: End Standard Change
-        uses: byu-oit/github-action-end-standard-change@v1
-        if: ${{ always() && steps.start-standard-change.outcome == 'success' }} # Run if RFC started, even if the deploy failed
-        with:
-          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
-          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
-          change-sys-id: ${{ steps.start-standard-change.outputs.change-sys-id }}
-          work-start: ${{ steps.start-standard-change.outputs.work-start }}
-          success: ${{ steps.deploy.outcome == 'success' }}
+      # TODO: uncomment when ittest is fixed
+      # - name: End Standard Change
+      #   uses: byu-oit/github-action-end-standard-change@v1
+      #   if: ${{ always() && steps.start-standard-change.outcome == 'success' }} # Run if RFC started, even if the deploy failed
+      #   with:
+      #     client-key: ${{ secrets[matrix.env.rfc_key_name] }}
+      #     client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
+      #     change-sys-id: ${{ steps.start-standard-change.outputs.change-sys-id }}
+      #     work-start: ${{ steps.start-standard-change.outputs.work-start }}
+      #     success: ${{ steps.deploy.outcome == 'success' }}
 
       - name: Send Slack Notification
         uses: byu-oit/github-action-slack@v1
