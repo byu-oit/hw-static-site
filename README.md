@@ -67,6 +67,9 @@ In the AWS Console, see if you can find the resources from `setup.tf` (Route 53 
 
 ### Enable GitHub Actions on your repo
 
+* Send a Slack message to #devops-tooling, requesting that GitHub Secrets be added to your repo. Include:
+  * The name of your GitHub repo
+  * The name of your AWS accounts
 * In GitHub, go to the `Actions` tab for your repo (e.g. https://github.com/byu-oit/my-repo/actions)
 * Click the `Enable Actions on this repo` button
 
