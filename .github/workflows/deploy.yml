@@ -27,7 +27,7 @@ jobs:
               }
             ]
           }'
-          echo "::set-env name=matrix::`echo $matrix | jq -c .`"
+          echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
 
       - name: Set up STG Environment Variables
         if: github.ref == 'refs/heads/stg'
@@ -45,7 +45,7 @@ jobs:
               }
             ]
           }'
-          echo "::set-env name=matrix::`echo $matrix | jq -c .`"
+          echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
 
       - name: Set up PRD/CPY Environment Variables
         if: github.ref == 'refs/heads/master'
@@ -76,7 +76,7 @@ jobs:
               }
             ]
           }'
-          echo "::set-env name=matrix::`echo $matrix | jq -c .`"
+          echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
 
     outputs:
       matrix: ${{ env.matrix }}
