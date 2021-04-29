@@ -1,0 +1,14 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/src"
+  schedule:
+    interval: daily
+    time: "08:00"
+    timezone: America/Denver
+  open-pull-requests-limit: 10
+  target-branch: dev
+  ignore:
+  - dependency-name: aws-sdk
+    versions:
+    - 2.x
