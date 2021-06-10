@@ -22,7 +22,7 @@ locals {
 
 provider "aws" {
   region = "us-west-2"
-  
+
   default_tags = {
     env              = local.env
     data-sensitivity = "public"
