@@ -17,7 +17,7 @@ terraform {
 }
 
 locals {
-  env = "cpy"
+  env = "prd"
 }
 
 provider "aws" {
