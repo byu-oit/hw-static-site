@@ -1,0 +1,11 @@
+version: 2
+
+updates:
+  # This is redundant in this template, but wil be helpful on a real JavaScript site that is built in the "src" folder
+  - package-ecosystem: "npm"
+    directory: /src
+    schedule:
+      interval: daily
+    target-branch: dev # Our dev pipeline runs off the dev branch, production runs off of master
+#    reviewers:
+#      - YourGitHubUsername

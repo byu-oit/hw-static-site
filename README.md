@@ -4,14 +4,12 @@ Example of creating and deploying a Static Website with S3 and Terraform on AWS.
 ## Prerequisites
 
 * Install [Terraform](https://www.terraform.io/downloads.html)
-* Install the [awslogin](https://pypi.org/project/byu-awslogin/) CLI tool
-* Log into a dev account (with awslogin)
 * Ensure your account has a [Terraform State S3 Backend](https://github.com/byu-oit/terraform-aws-backend-s3) deployed.
 
 ## Setup
 * Create a new repo [using this template](https://github.com/byu-oit/hw-static-site/generate).
 
-  You need your own repo so that you can push changes and have CodePipeline deploy them.
+  You need your own repo so that you can push changes and have GitHub Actions deploy them.
   
   Keep your repo name relatively short. Since we're creating AWS resources based off the name, we've seen [issues with repo names longer than about 24 characters](https://github.com/byu-oit/hello-world-api/issues/22).
 
@@ -101,7 +99,7 @@ git commit -am "try deploying a change"
 git push
 ```
 
-In GitHub Actions, watch the deploy steps run (you have a new push, so you'll have to go back and select the new workflow run instance and the job again). Once the `Invalidate CloudFront cache` step succeeds, hit your application in the browser and see if your change worked.
+In GitHub Actions, watch the deploy steps run (you have a new push, so you'll have to go back and select the new workflow run instance and the job again). Once the `Invalidate CloudFront cache` step succeeds, hit your application in the browser and see if your change worked. If you aren't seeing the change, you may need to invalidate your browser cache as well.
 
 > Note: 
 >
@@ -114,3 +112,7 @@ In GitHub Actions, watch the deploy steps run (you have a new push, so you'll ha
 By digging through the `.tf` files, you'll see what resources are being created. You should spend some time searching through the AWS Console for each of these resources. The goal is to start making connections between the Terraform syntax and the actual AWS resources that are created.
 
 Several OIT created Terraform modules are used. You can look these modules up in our GitHub Organization. There you can see what resources each of these modules creates. You can look those up in the AWS Console too.
+
+### Related Modules
+
+* [Terraform AWS Domain Redirect](https://github.com/byu-oit/terraform-aws-domain-redirect)
