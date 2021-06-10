@@ -44,7 +44,7 @@ jobs:
           echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
 
       - name: Set up PRD/CPY Environment Variables
-        if: github.base_ref == 'master'
+        if: github.base_ref == 'main'
         run: |
           matrix='{
             "env":[
