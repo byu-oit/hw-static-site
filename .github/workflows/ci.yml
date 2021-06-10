@@ -2,10 +2,13 @@ name: CI
 
 on:
   pull_request:
-    branches: [dev, stg, master]
+    branches: [dev, stg, main]
     types: [opened, reopened, synchronize, edited]
+    paths-ignore:
+      - LICENSE
+      - README.md
 env:
-  tf_version: "0.12.26" # must match value in terraform-iac/*/app/main.tf
+  tf_version: "1.0.0" # must match value in terraform-iac/*/app/main.tf
 
 jobs:
   env:
@@ -103,11 +106,21 @@ jobs:
         with:
           terraform_version: ${{ env.tf_version }}
 
-      - name: Terraform Init
-        working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform init
-
       - name: Terraform Plan
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform plan -input=false
-    # TODO: Post plan back to PR
+        run: terraform plan -var 'image_tag=ci_test' -input=false -out plan -lock=false
+
+      - name: Comment Terraform Plan
+        uses: byu-oit/github-action-tf-plan-comment@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: ${{ matrix.env.tf_working_dir }}
+          terraform-plan-file: plan
+
+      - name: Analyze Terraform Plan
+        uses: byu-oit/github-action-tf-plan-analyzer@v2
+        with:
+          working-directory: ${{ matrix.env.tf_working_dir }}
+          terraform-plan-file: plan
+          divvycloud-username: ${{ secrets.DIVVYCLOUD_USERNAME }}
+          divvycloud-password: ${{ secrets.DIVVYCLOUD_PASSWORD }}

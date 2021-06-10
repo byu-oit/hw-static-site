@@ -1,21 +1,38 @@
 terraform {
-  required_version = "0.12.26" # must match value in .github/workflows/*.yml
+  required_version = "1.0.0"
+
   backend "s3" {
     bucket         = "terraform-state-storage-977306314792"
     dynamodb_table = "terraform-state-lock-977306314792"
     key            = "hw-static-site-stg/app.tfstate"
     region         = "us-west-2"
   }
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+  }
+}
+
+locals {
+  env = "stg"
 }
 
 provider "aws" {
-  version = "~> 2.42"
-  region  = "us-west-2"
+  region = "us-west-2"
+  
+  default_tags = {
+    env              = local.env
+    data-sensitivity = "public"
+    repo             = "https://github.com/byu-oit/hw-static-site"
+  }
 }
 
 module "app" {
   source = "../../modules/app/"
-  env    = "stg"
+  env    = local.env
 }
 
 output "s3_bucket" {
