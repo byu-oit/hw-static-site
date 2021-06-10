@@ -1,7 +1,7 @@
 version: 2
 
 updates:
-  # This is redundant in this template, but wil be helpful one a real JavaScript site is is built in the "src" folder
+  # This is redundant in this template, but wil be helpful on a real JavaScript site that is built in the "src" folder
   - package-ecosystem: "npm"
     directory: /src
     schedule:
