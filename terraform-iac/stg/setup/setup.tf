@@ -23,10 +23,12 @@ locals {
 provider "aws" {
   region = "us-west-2"
 
-  default_tags = {
-    env              = local.env
-    data-sensitivity = "public"
-    repo             = "https://github.com/byu-oit/hw-static-site"
+  default_tags {
+    tags = {
+      env              = local.env
+      data-sensitivity = "public"
+      repo             = "https://github.com/byu-oit/hw-static-site"
+    }
   }
 }
 
