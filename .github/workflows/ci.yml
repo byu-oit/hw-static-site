@@ -75,10 +75,10 @@ jobs:
       matrix: ${{ fromJson(needs.env.outputs.matrix) }}
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.tf_version }}
 
@@ -96,7 +96,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -106,7 +106,7 @@ jobs:
           aws-region: us-west-2
 
       - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.tf_version }}
 
@@ -142,10 +142,10 @@ jobs:
       pull-requests: write
       contents: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Auto-merge Dependabot Pull Request
-        uses: fastify/github-action-merge-dependabot@v3.0.2
+        uses: fastify/github-action-merge-dependabot@v3.2.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           target: minor
