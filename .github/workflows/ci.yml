@@ -94,6 +94,7 @@ jobs:
       matrix: ${{ fromJson(needs.env.outputs.matrix) }}
       fail-fast: false
     permissions:
+      contents: read
       pull-requests: write
     steps:
       - uses: actions/checkout@v3
