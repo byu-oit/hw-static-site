@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [dev, stg, main]
+    branches: [dev, stg, prd]
     types: [opened, reopened, synchronize, edited]
     paths-ignore:
       - LICENSE
@@ -44,7 +44,7 @@ jobs:
           echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
 
       - name: Set up PRD/CPY Environment Variables
-        if: github.base_ref == 'main'
+        if: github.base_ref == 'prd'
         run: |
           matrix='{
             "env":[

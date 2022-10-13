@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [dev, stg, main]
+    branches: [dev, stg, prd]
     paths-ignore:
       - LICENSE
       - README.md
@@ -52,7 +52,7 @@ jobs:
           echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
 
       - name: Set up PRD/CPY Environment Variables
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/prd'
         # TODO: When prd really is production, in prd environment (first block below):
         # * Change standard_change_sandbox_client_key to standard_change_production_client_key
         # * Change standard_change_sandbox_client_secret to standard_change_production_client_secret
