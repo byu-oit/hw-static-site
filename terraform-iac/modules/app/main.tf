@@ -17,7 +17,7 @@ data "aws_route53_zone" "zone" {
 }
 
 module "s3_site" {
-  source         = "github.com/byu-oit/terraform-aws-s3staticsite?ref=notpublic"
+  source         = "github.com/byu-oit/terraform-aws-s3staticsite?ref=v7.0.0"
   site_url       = local.url
   hosted_zone_id = data.aws_route53_zone.zone.id
   s3_bucket_name = "${local.app_name}-${var.env}"
