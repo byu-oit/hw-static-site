@@ -1,5 +1,5 @@
 terraform {
-  required_version = "1.0.0"
+  required_version = "1.3.7"
 
   backend "s3" {
     bucket         = "terraform-state-storage-539738229445"
