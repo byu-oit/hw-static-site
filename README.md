@@ -27,9 +27,7 @@ git checkout -b dev
   * replace `539738229445` with your prd AWS account number
   * replace `hw-static-site` with the name of your repo
   * replace `byu-oit-terraform-dev` with the name of your `dev` AWS account
-  * replace `byu_oit_terraform_dev` with the name of your `dev` AWS account (with underscores)
   * replace `byu-oit-terraform-prd` with the name of your `prd` AWS account
-  * replace `byu_oit_terraform_prd` with the name of your `prd` AWS account (with underscores)
 * Commit/push your changes
 ```
 git commit -am "update template with repo specific details" 
@@ -61,17 +59,13 @@ mysite-dev.byu.edu NS ns-91.awsdns-11.com
 
 As another example, if your site's URL was `mysite-dev.mydepartment.byu.edu`, and `mydepartment.byu.edu` was already controlled by a Route 53 Hosted Zone, you would manually add the NS records to the Hosted Zone for `mydepartment.byu.edu`.
 
-In the AWS Console, see if you can find the resources from `setup.tf` (Route 53 Hosted Zone).
+In the AWS Console, see if you can find the resources from `setup.tf` (Route 53 Hosted Zone, IAM Role).
 
-### Enable GitHub Actions on your repo
-
-* Use this [order form](https://it.byu.edu/it?id=sc_cat_item&sys_id=d20809201b2d141069fbbaecdc4bcb84) to give your repo access to the secrets that will let it deploy into your AWS accounts. Fill out the form twice to give access to both your `dev` and `prd` accounts.
-* In GitHub, go to the `Actions` tab for your repo (e.g. https://github.com/byu-oit/my-repo/actions)
-* Click the `Enable Actions on this repo` button
+### View the workflow run
 
 If you look at `.github/workflows/deploy.yml`, you'll see that it is setup to run on pushes to the dev branch. Because you have already pushed to the dev branch, this workflow should be running now.
 
-* In GitHub, click on the workflow run (it has the same name as the last commit message you pushed)
+* In GitHub, in the Actions tab, click on the workflow run (it has the same name as the last commit message you pushed)
 * Click on the `Build and deploy Webapp to S3` job
 * Expand any of the steps to see what they are doing
 
