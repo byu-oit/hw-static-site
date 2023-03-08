@@ -4,12 +4,13 @@ on:
   push:
     branches: [dev, stg, prd]
     paths-ignore:
-      - LICENSE
-      - README.md
-concurrency: ${{ github.ref }}
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
 env:
   tf_version: "1.3.7" # must match value in terraform-iac/*/app/main.tf
-
+  FORCE_COLOR: 3
+concurrency: ${{ github.ref }}
 jobs:
   env:
     name: Set Env Vars
@@ -21,6 +22,7 @@ jobs:
           matrix='{
             "env":[
               {
+                "environment_name":"dev",
                 "tf_working_dir":"./terraform-iac/dev/app",
                 "aws_account":"977306314792",
                 "aws_gha_role":"hw-static-site-dev-gha",
@@ -38,6 +40,7 @@ jobs:
           matrix='{
             "env":[
               {
+                "environment_name":"stg",
                 "tf_working_dir":"./terraform-iac/stg/app",
                 "aws_account":"977306314792",
                 "aws_gha_role":"hw-static-site-stg-gha",
@@ -54,11 +57,12 @@ jobs:
         # TODO: When prd really is production, in prd environment (first block below):
         # * Change standard_change_sandbox_client_key to standard_change_production_client_key
         # * Change standard_change_sandbox_client_secret to standard_change_production_client_secret
-        # You probably don't want to do this in cpy (second block), or you will get two RFCs everytime you push to master
+        # You probably don't want to do this in cpy (second block), or you will get two RFCs everytime you push to prd
         run: |
           matrix='{
             "env":[
               {
+                "environment_name":"prd",
                 "tf_working_dir":"./terraform-iac/prd/app",
                 "aws_account":"539738229445",
                 "aws_gha_role":"hw-static-site-prd-gha",
@@ -67,6 +71,7 @@ jobs:
                 "rfc_template_id":"Codepipeline-Standard-Change"
               },
               {
+                "environment_name":"cpy",
                 "tf_working_dir":"./terraform-iac/cpy/app",
                 "aws_account":"539738229445",
                 "aws_gha_role":"hw-static-site-cpy-gha",
@@ -87,6 +92,10 @@ jobs:
     needs: env
     strategy:
       matrix: ${{ fromJson(needs.env.outputs.matrix) }}
+      fail-fast: false
+    environment:
+      name: ${{ matrix.env.environment_name }}
+      url: https://${{ steps.url.outputs.stdout }}
     permissions:
       id-token: write
       contents: read
@@ -94,12 +103,7 @@ jobs:
       - name: Check out
         uses: actions/checkout@v3
 
-      - name: Disallow Concurrent Runs
-        uses: byu-oit/github-action-disallow-concurrent-runs@v2
-        with:
-          token: ${{ github.token }}
-
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: "arn:aws:iam::${{ matrix.env.aws_account }}:role/${{ matrix.env.aws_gha_role }}"
@@ -110,6 +114,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.tf_version }}
+          terraform_wrapper: false
 
       - name: Terraform Init
         working-directory: ${{ matrix.env.tf_working_dir }}
@@ -121,10 +126,12 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform plan -input=false -out plan -lock=false
+        run: terraform plan -input=false -out=plan
 
       - name: Analyze Terraform Plan
         uses: byu-oit/github-action-tf-plan-analyzer@v2
+        if: github.repository_owner == 'byu-oit'
+        # If you're at BYU, but outside the byu-oit GitHub org, you may be able to obtain credentials by contacting cloudoffice@byu.edu
         with:
           working-directory: ${{ matrix.env.tf_working_dir }}
           terraform-plan-file: plan
@@ -143,22 +150,19 @@ jobs:
         working-directory: ${{ matrix.env.tf_working_dir }}
         run: terraform apply plan
 
-      - name: Get Bucket Name
-        id: s3_tf_outputs
+      - name: Get Terraform Outputs
+        id: terraform-outputs
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform output s3_bucket
+        run: |
+          echo "s3_bucket=$(terraform output -raw s3_bucket)" >> $GITHUB_OUTPUT
+          echo "cf_distribution_id=$(terraform output -raw cf_distribution_id)" >> $GITHUB_OUTPUT
 
       - name: Copy src to S3 Site Bucket
         id: deploy
-        run: aws s3 sync src s3://${{ steps.s3_tf_outputs.outputs.stdout }}
-
-      - name: Get CloudFront Distribution ID
-        id: cf_tf_outputs
-        working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform output cf_distribution_id
+        run: aws s3 sync src s3://${{ steps.terraform-outputs.outputs.s3_bucket }}
 
       - name: Invalidate CloudFront Cache
-        run: aws cloudfront create-invalidation --path '/*' --distribution-id ${{ steps.cf_tf_outputs.outputs.stdout }}
+        run: aws cloudfront create-invalidation --path '/*' --distribution-id ${{ steps.terraform-outputs.outputs.cf_distribution_id }}
 
       - name: End Standard Change
         uses: byu-oit/github-action-end-standard-change@v1
@@ -168,5 +172,5 @@ jobs:
           client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
           change-sys-id: ${{ steps.start-standard-change.outputs.change-sys-id }}
           work-start: ${{ steps.start-standard-change.outputs.work-start }}
-          success: ${{ steps.deploy.outcome == 'success' }}
+          success: ${{ job.status == 'success' }}
 
