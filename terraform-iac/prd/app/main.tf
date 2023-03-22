@@ -1,5 +1,5 @@
 terraform {
-  required_version = "1.4.0"
+  required_version = "1.4.2"
 
   backend "s3" {
     bucket         = "terraform-state-storage-539738229445"
@@ -11,11 +11,15 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.58"
+      version = "~> 4.59"
     }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.4"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.4"
     }
   }
 }
