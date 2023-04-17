@@ -1,17 +1,21 @@
 terraform {
-  required_version = "1.4.2"
+  required_version = "1.4.5"
 
   backend "s3" {
     bucket         = "terraform-state-storage-539738229445"
     dynamodb_table = "terraform-state-lock-539738229445"
-    key            = "hw-static-site-cpy/setup.tfstate"
+    key            = "hw-static-site-cpy/app.tfstate"
     region         = "us-west-2"
   }
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.59"
+      version = "~> 4.63"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.5"
     }
     local = {
       source  = "hashicorp/local"
@@ -36,23 +40,19 @@ provider "aws" {
   }
 }
 
-module "setup" {
-  source = "../../modules/setup/"
+module "app" {
+  source = "../../modules/app/"
   env    = local.env
 }
 
-output "hosted_zone_id" {
-  value = module.setup.hosted_zone.zone_id
+output "s3_bucket" {
+  value = module.app.s3_bucket
 }
 
-output "hosted_zone_name" {
-  value = module.setup.hosted_zone.name
+output "cf_distribution_id" {
+  value = module.app.cf_distribution_id
 }
 
-output "hosted_zone_name_servers" {
-  value = module.setup.hosted_zone.name_servers
-}
-
-output "note" {
-  value = "These NS records need to be manually added to the parent DNS authority (probably QIP or Route 53)."
+output "url" {
+  value = module.app.url
 }
