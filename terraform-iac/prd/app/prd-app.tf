@@ -33,6 +33,7 @@ provider "aws" {
 
   default_tags {
     tags = {
+      app              = "hw-static-site"
       env              = local.env
       data-sensitivity = "public"
       repo             = "https://github.com/byu-oit/hw-static-site"
