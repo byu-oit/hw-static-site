@@ -17,6 +17,8 @@ jobs:
     name: Set Env Vars
     timeout-minutes: 1
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Set up DEV Environment Variables
         if: github.base_ref == 'dev'
@@ -78,6 +80,8 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.env.outputs.matrix) }}
       fail-fast: false
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v5
 
