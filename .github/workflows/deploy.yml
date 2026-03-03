@@ -170,7 +170,7 @@ jobs:
         run: aws cloudfront create-invalidation --path '/*' --distribution-id ${{ steps.terraform-outputs.outputs.cf_distribution_id }}
 
       - name: End Standard Change
-        uses: byu-oit/github-action-end-standard-change@v1
+        uses: byu-oit/github-action-end-standard-change@v2
         if: always() && steps.start-standard-change.outcome == 'success' # Run if RFC started, even if the deploy failed
         with:
           client-key: ${{ secrets[matrix.env.rfc_key_name] }}
