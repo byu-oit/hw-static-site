@@ -1,9 +1,9 @@
 # hw-static-site
-Example of creating and deploying a Static Website with S3 and Terraform on AWS.
+Example of creating and deploying a Static Website with S3 and OpenTofu on AWS.
 
 ## Prerequisites
 
-* Install [Terraform](https://www.terraform.io/downloads.html)
+* Install [OpenTofu](https://opentofu.org/docs/intro/install/)
 * Ensure your account has a [Terraform State S3 Backend](https://github.com/byu-oit/terraform-aws-backend-s3) deployed.
 
 ## Setup
@@ -39,9 +39,9 @@ git push
 ### Deploy the "one time setup" resources
 
 ```
-cd terraform-iac/dev/setup/
-terraform init
-terraform apply
+cd terraform/setup/
+tofu init -var-file=dev.tfvars
+tofu apply -var-file=dev.tfvars
 ```
 
 The output from this will give you the NS records for your new Hosted Zone. These NS records need to be entered into the DNS system of record for the parent domain.
@@ -55,7 +55,7 @@ mysite-dev.byu.edu NS ns-829.awsdns-39.net
 mysite-dev.byu.edu NS ns-91.awsdns-11.com
 ```
 
-(You'll need to change the actual values based on the output from `terraform apply`)
+(You'll need to change the actual values based on the output from `tofu apply`)
 
 As another example, if your site's URL was `mysite-dev.mydepartment.byu.edu`, and `mydepartment.byu.edu` was already controlled by a Route 53 Hosted Zone, you would manually add the NS records to the Hosted Zone for `mydepartment.byu.edu`.
 
@@ -71,11 +71,11 @@ If you look at `.github/workflows/deploy.yml`, you'll see that it is setup to ru
 
 ### View the deployed application
 
-Anytime after the `Terraform Apply` step succeeds   :
+Anytime after the `OpenTofu Apply` step succeeds   :
 ```
 cd ../app/
-terraform init
-terraform output
+tofu init -var-file=dev.tfvars
+tofu output
 ```
 
 This will output a DNS Name. Enter this in a browser. It will probably return an error. This is because your content hasn't been uploaded yet, or the CloudFront distribution hasn't been updated.
@@ -103,7 +103,7 @@ In GitHub Actions, watch the deploy steps run (you have a new push, so you'll ha
 
 ## Learn what was built
 
-By digging through the `.tf` files, you'll see what resources are being created. You should spend some time searching through the AWS Console for each of these resources. The goal is to start making connections between the Terraform syntax and the actual AWS resources that are created.
+By digging through the `.tf` files, you'll see what resources are being created. You should spend some time searching through the AWS Console for each of these resources. The goal is to start making connections between the OpenTofu syntax and the actual AWS resources that are created.
 
 Several OIT created Terraform modules are used. You can look these modules up in our GitHub Organization. There you can see what resources each of these modules creates. You can look those up in the AWS Console too.
 

@@ -9,7 +9,7 @@ on:
       - 'LICENSE'
       - '.gitignore'
 env:
-  tf_version: "1.7.0" # must match value in terraform-iac/*/app/main.tf
+  tofu_version: "1.8.0" # must satisfy terraform/app/main.tf and terraform/setup/setup.tf
   FORCE_COLOR: 3
 concurrency: ${{ github.ref }}
 jobs:
@@ -27,7 +27,8 @@ jobs:
             "env":[
               {
                 "environment_name":"dev",
-                "tf_working_dir":"./terraform-iac/dev/app",
+                "tf_working_dir":"./terraform/app",
+                "tf_var_file":"dev.tfvars",
                 "aws_account":"977306314792",
                 "aws_gha_role":"hw-static-site-dev-gha",
                 "rfc_key_name":"standard_change_sandbox_client_key",
@@ -45,7 +46,8 @@ jobs:
             "env":[
               {
                 "environment_name":"stg",
-                "tf_working_dir":"./terraform-iac/stg/app",
+                "tf_working_dir":"./terraform/app",
+                "tf_var_file":"stg.tfvars",
                 "aws_account":"977306314792",
                 "aws_gha_role":"hw-static-site-stg-gha",
                 "rfc_key_name":"standard_change_sandbox_client_key",
@@ -67,7 +69,8 @@ jobs:
             "env":[
               {
                 "environment_name":"prd",
-                "tf_working_dir":"./terraform-iac/prd/app",
+                "tf_working_dir":"./terraform/app",
+                "tf_var_file":"prd.tfvars",
                 "aws_account":"539738229445",
                 "aws_gha_role":"hw-static-site-prd-gha",
                 "rfc_key_name":"standard_change_sandbox_client_key",
@@ -76,7 +79,8 @@ jobs:
               },
               {
                 "environment_name":"cpy",
-                "tf_working_dir":"./terraform-iac/cpy/app",
+                "tf_working_dir":"./terraform/app",
+                "tf_var_file":"cpy.tfvars",
                 "aws_account":"539738229445",
                 "aws_gha_role":"hw-static-site-cpy-gha",
                 "rfc_key_name":"standard_change_sandbox_client_key",
@@ -115,23 +119,26 @@ jobs:
           role-session-name: ${{ github.sha }}
           aws-region: us-west-2
 
-      - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v4
+      - name: OpenTofu Setup
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: ${{ env.tf_version }}
-          terraform_wrapper: false
+          tofu_version: ${{ env.tofu_version }}
+          tofu_wrapper: false
 
-      - name: Terraform Init
+      - name: Terraform Compatibility Alias
+        run: sudo ln -sf "$(command -v tofu)" /usr/local/bin/terraform
+
+      - name: OpenTofu Init
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform init
+        run: tofu init -var-file=${{ matrix.env.tf_var_file }}
 
-      - name: Terraform Format
+      - name: OpenTofu Format
         working-directory: "./"
-        run: terraform fmt -check -recursive
+        run: tofu fmt -check -recursive
 
-      - name: Terraform Plan
+      - name: OpenTofu Plan
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform plan -input=false -out=plan
+        run: tofu plan -input=false -out=plan -var-file=${{ matrix.env.tf_var_file }}
 
       - name: Analyze Terraform Plan
         uses: byu-oit/github-action-tf-plan-analyzer@v2
@@ -151,23 +158,23 @@ jobs:
           client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
           template-id: ${{ matrix.env.rfc_template_id }}
 
-      - name: Terraform Apply
+      - name: OpenTofu Apply
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform apply plan
+        run: tofu apply plan
 
-      - name: Get Terraform Outputs
-        id: terraform-outputs
+      - name: Get OpenTofu Outputs
+        id: tofu-outputs
         working-directory: ${{ matrix.env.tf_working_dir }}
         run: |
-          echo "s3_bucket=$(terraform output -raw s3_bucket)" >> $GITHUB_OUTPUT
-          echo "cf_distribution_id=$(terraform output -raw cf_distribution_id)" >> $GITHUB_OUTPUT
+          echo "s3_bucket=$(tofu output -raw s3_bucket)" >> $GITHUB_OUTPUT
+          echo "cf_distribution_id=$(tofu output -raw cf_distribution_id)" >> $GITHUB_OUTPUT
 
       - name: Copy src to S3 Site Bucket
         id: deploy
-        run: aws s3 sync src s3://${{ steps.terraform-outputs.outputs.s3_bucket }}
+        run: aws s3 sync src s3://${{ steps.tofu-outputs.outputs.s3_bucket }}
 
       - name: Invalidate CloudFront Cache
-        run: aws cloudfront create-invalidation --path '/*' --distribution-id ${{ steps.terraform-outputs.outputs.cf_distribution_id }}
+        run: aws cloudfront create-invalidation --path '/*' --distribution-id ${{ steps.tofu-outputs.outputs.cf_distribution_id }}
 
       - name: End Standard Change
         uses: byu-oit/github-action-end-standard-change@v2
@@ -178,4 +185,3 @@ jobs:
           change-sys-id: ${{ steps.start-standard-change.outputs.change-sys-id }}
           work-start: ${{ steps.start-standard-change.outputs.work-start }}
           success: ${{ job.status == 'success' }}
-
