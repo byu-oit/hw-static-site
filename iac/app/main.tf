@@ -40,6 +40,11 @@ terraform {
   }
 }
 
+moved {
+  from = module.app.module.s3_site
+  to   = module.s3_site
+}
+
 locals {
   app_name  = "hw-static-site"
   subdomain = var.env == "prd" ? local.app_name : "${local.app_name}-${var.env}"
