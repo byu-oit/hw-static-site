@@ -39,7 +39,7 @@ git push
 ### Deploy the "one time setup" resources
 
 ```
-cd terraform/setup/
+cd iac/setup/
 tofu init -var-file=dev.tfvars
 tofu apply -var-file=dev.tfvars
 ```
