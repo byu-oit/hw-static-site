@@ -27,7 +27,7 @@ jobs:
             "env":[
               {
                 "environment_name":"dev",
-                "tf_working_dir":"./terraform/app",
+                "tf_working_dir":"./iac/app",
                 "tf_var_file":"dev.tfvars",
                 "aws_account":"977306314792",
                 "aws_gha_role":"hw-static-site-dev-gha",
@@ -46,7 +46,7 @@ jobs:
             "env":[
               {
                 "environment_name":"stg",
-                "tf_working_dir":"./terraform/app",
+                "tf_working_dir":"./iac/app",
                 "tf_var_file":"stg.tfvars",
                 "aws_account":"977306314792",
                 "aws_gha_role":"hw-static-site-stg-gha",
@@ -69,7 +69,7 @@ jobs:
             "env":[
               {
                 "environment_name":"prd",
-                "tf_working_dir":"./terraform/app",
+                "tf_working_dir":"./iac/app",
                 "tf_var_file":"prd.tfvars",
                 "aws_account":"539738229445",
                 "aws_gha_role":"hw-static-site-prd-gha",
@@ -79,7 +79,7 @@ jobs:
               },
               {
                 "environment_name":"cpy",
-                "tf_working_dir":"./terraform/app",
+                "tf_working_dir":"./iac/app",
                 "tf_var_file":"cpy.tfvars",
                 "aws_account":"539738229445",
                 "aws_gha_role":"hw-static-site-cpy-gha",
