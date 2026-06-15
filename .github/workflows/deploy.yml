@@ -9,7 +9,7 @@ on:
       - 'LICENSE'
       - '.gitignore'
 env:
-  tofu_version: "1.8.0" # must satisfy terraform/app/main.tf and terraform/setup/setup.tf
+  tofu_version: "1.8.0" # must satisfy iac/app/main.tf and iac/setup/setup.tf
   FORCE_COLOR: 3
 concurrency: ${{ github.ref }}
 jobs:
