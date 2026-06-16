@@ -10,7 +10,6 @@ on:
       - '.gitignore'
 env:
   tofu_version: "1.8.0" # must satisfy iac/app/main.tf and iac/setup/setup.tf
-  FORCE_COLOR: 3
 concurrency: ${{ github.ref }}
 jobs:
   env:
@@ -95,7 +94,7 @@ jobs:
       matrix: ${{ env.matrix }}
 
   build_and_deploy:
-    name: Build and Deploy Webapp to S3
+    name: Build and Deploy Webapp to S3 / ${{ matrix.env.environment_name }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
     needs: env

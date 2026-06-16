@@ -10,7 +10,6 @@ on:
       - '.gitignore'
 env:
   tofu_version: "1.8.0" # must satisfy iac/app/main.tf and iac/setup/setup.tf
-  FORCE_COLOR: 3
 
 jobs:
   env:
@@ -26,6 +25,7 @@ jobs:
           matrix='{
             "env":[
               {
+                "environment_name":"dev",
                 "tf_working_dir":"./iac/app",
                 "tf_var_file":"dev.tfvars",
                 "aws_account":"977306314792",
@@ -41,6 +41,7 @@ jobs:
           matrix='{
             "env":[
               {
+                "environment_name":"stg",
                 "tf_working_dir":"./iac/app",
                 "tf_var_file":"stg.tfvars",
                 "aws_account":"977306314792",
@@ -56,12 +57,14 @@ jobs:
           matrix='{
             "env":[
               {
+                "environment_name":"prd",
                 "tf_working_dir":"./iac/app",
                 "tf_var_file":"prd.tfvars",
                 "aws_account":"539738229445",
                 "aws_gha_role":"hw-static-site-prd-gha"
               },
               {
+                "environment_name":"cpy",
                 "tf_working_dir":"./iac/app",
                 "tf_var_file":"cpy.tfvars",
                 "aws_account":"539738229445",
@@ -77,7 +80,7 @@ jobs:
   # TODO: Add jobs to build and test website code
 
   format:
-    name: OpenTofu Format
+    name: Tofu Format
     timeout-minutes: 3
     runs-on: ubuntu-latest
     needs: env
@@ -99,7 +102,7 @@ jobs:
         run: tofu fmt -check -recursive
 
   plan:
-    name: OpenTofu Plan
+    name: Tofu Plan / ${{ matrix.env.environment_name }}
     timeout-minutes: 6
     runs-on: ubuntu-latest
     needs: env
