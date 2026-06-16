@@ -163,8 +163,8 @@ jobs:
         id: tofu-outputs
         working-directory: ${{ matrix.env.tf_working_dir }}
         run: |
-          echo "s3_bucket=$(tofu output -raw s3_bucket)" >> $GITHUB_OUTPUT
-          echo "cf_distribution_id=$(tofu output -raw cf_distribution_id)" >> $GITHUB_OUTPUT
+          echo "s3_bucket=$(tofu output -var-file=${{ matrix.env.tf_var_file }} -raw s3_bucket)" >> $GITHUB_OUTPUT
+          echo "cf_distribution_id=$(tofu output -var-file=${{ matrix.env.tf_var_file }} -raw cf_distribution_id)" >> $GITHUB_OUTPUT
 
       - name: Copy src to S3 Site Bucket
         id: deploy
