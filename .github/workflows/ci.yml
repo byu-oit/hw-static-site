@@ -126,9 +126,6 @@ jobs:
         with:
           tofu_version: ${{ env.tofu_version }}
 
-      - name: Terraform Compatibility Alias
-        run: sudo ln -sf "$(command -v tofu)" /usr/local/bin/terraform
-
       - name: OpenTofu Init
         working-directory: ${{ matrix.env.tf_working_dir }}
         run: tofu init -var-file=${{ matrix.env.tf_var_file }}
