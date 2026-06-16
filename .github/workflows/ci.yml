@@ -9,8 +9,7 @@ on:
       - 'LICENSE'
       - '.gitignore'
 env:
-  tf_version: "1.7.0" # must match value in terraform-iac/*/app/main.tf
-  FORCE_COLOR: 3
+  tofu_version: "1.8.0" # must satisfy iac/app/main.tf and iac/setup/setup.tf
 
 jobs:
   env:
@@ -26,7 +25,9 @@ jobs:
           matrix='{
             "env":[
               {
-                "tf_working_dir":"./terraform-iac/dev/app",
+                "environment_name":"dev",
+                "tf_working_dir":"./iac/app",
+                "tf_var_file":"dev.tfvars",
                 "aws_account":"977306314792",
                 "aws_gha_role":"hw-static-site-dev-gha"
               }
@@ -40,7 +41,9 @@ jobs:
           matrix='{
             "env":[
               {
-                "tf_working_dir":"./terraform-iac/stg/app",
+                "environment_name":"stg",
+                "tf_working_dir":"./iac/app",
+                "tf_var_file":"stg.tfvars",
                 "aws_account":"977306314792",
                 "aws_gha_role":"hw-static-site-stg-gha"
               }
@@ -54,12 +57,16 @@ jobs:
           matrix='{
             "env":[
               {
-                "tf_working_dir":"./terraform-iac/prd/app",
+                "environment_name":"prd",
+                "tf_working_dir":"./iac/app",
+                "tf_var_file":"prd.tfvars",
                 "aws_account":"539738229445",
                 "aws_gha_role":"hw-static-site-prd-gha"
               },
               {
-                "tf_working_dir":"./terraform-iac/cpy/app",
+                "environment_name":"cpy",
+                "tf_working_dir":"./iac/app",
+                "tf_var_file":"cpy.tfvars",
                 "aws_account":"539738229445",
                 "aws_gha_role":"hw-static-site-cpy-gha"
               }
@@ -73,7 +80,7 @@ jobs:
   # TODO: Add jobs to build and test website code
 
   format:
-    name: Terraform Format
+    name: Tofu Format
     timeout-minutes: 3
     runs-on: ubuntu-latest
     needs: env
@@ -85,17 +92,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v4
+      - name: OpenTofu Setup
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: ${{ env.tf_version }}
+          tofu_version: ${{ env.tofu_version }}
 
-      - name: Terraform Format
+      - name: OpenTofu Format
         working-directory: "./"
-        run: terraform fmt -check -recursive
+        run: tofu fmt -check -recursive
 
   plan:
-    name: Terraform Plan
+    name: Tofu Plan / ${{ matrix.env.environment_name }}
     timeout-minutes: 6
     runs-on: ubuntu-latest
     needs: env
@@ -117,18 +124,18 @@ jobs:
           role-session-name: ${{ github.sha }}
           aws-region: us-west-2
 
-      - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v4
+      - name: OpenTofu Setup
+        uses: opentofu/setup-opentofu@v1
         with:
-          terraform_version: ${{ env.tf_version }}
+          tofu_version: ${{ env.tofu_version }}
 
-      - name: Terraform Init
+      - name: OpenTofu Init
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform init
+        run: tofu init -var-file=${{ matrix.env.tf_var_file }}
 
-      - name: Terraform Plan
+      - name: OpenTofu Plan
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform plan -input=false -out plan -lock=false
+        run: tofu plan -input=false -out=plan -lock=false -var-file=${{ matrix.env.tf_var_file }}
 
       - name: Comment Terraform Plan
         uses: byu-oit/github-action-tf-plan-comment@v1
@@ -144,4 +151,3 @@ jobs:
           terraform-plan-file: plan
           divvycloud-username: ${{ secrets.DIVVYCLOUD_USERNAME }}
           divvycloud-password: ${{ secrets.DIVVYCLOUD_PASSWORD }}
-
