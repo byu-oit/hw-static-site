@@ -119,7 +119,7 @@ jobs:
           aws-region: us-west-2
 
       - name: OpenTofu Setup
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@v2
         with:
           tofu_version: ${{ env.tofu_version }}
           tofu_wrapper: false
