@@ -27,7 +27,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.33"
+      version = "~> 6.60"
     }
     local = {
       source  = "hashicorp/local"
@@ -61,7 +61,7 @@ provider "aws" {
 }
 
 module "acs" {
-  source = "github.com/byu-oit/terraform-aws-acs-info?ref=v4.0.0"
+  source = "github.com/byu-oit/terraform-aws-acs-info?ref=v4.1.0"
 }
 
 resource "aws_route53_zone" "zone" {
@@ -70,7 +70,7 @@ resource "aws_route53_zone" "zone" {
 
 module "gha_role" {
   source                         = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                        = "5.30.0"
+  version                        = "6.8.0"
   create_role                    = true
   role_name                      = "${local.name}-${var.env}-gha"
   provider_url                   = module.acs.github_oidc_provider.url
