@@ -70,7 +70,7 @@ resource "aws_route53_zone" "zone" {
 
 module "gha_role" {
   source                         = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version                        = "6.8.0"
+  version                        = "6.8.1"
   create_role                    = true
   role_name                      = "${local.name}-${var.env}-gha"
   provider_url                   = module.acs.github_oidc_provider.url
