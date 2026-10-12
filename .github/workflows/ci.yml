@@ -114,6 +114,7 @@ jobs:
       actions: read
       pull-requests: write
       id-token: write
+      security-events: write
     steps:
       - uses: actions/checkout@v7
 
@@ -148,6 +149,3 @@ jobs:
         uses: byu-oit/github-action-tf-plan-analyzer@v2
         with:
           working-directory: ${{ matrix.env.tf_working_dir }}
-          terraform-plan-file: plan
-          divvycloud-username: ${{ secrets.DIVVYCLOUD_USERNAME }}
-          divvycloud-password: ${{ secrets.DIVVYCLOUD_PASSWORD }}
