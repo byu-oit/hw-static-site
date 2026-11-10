@@ -1,12 +1,8 @@
 version: 2
 
 updates:
-  - package-ecosystem: npm
-    directory: '/src'
-    schedule:
-      interval: daily
-    target-branch: dev
-
+  # Keep each environment branch current independently so dependency updates
+  # deploy through that branch's existing workflow after they merge.
   - package-ecosystem: github-actions
     directory: '/' # Check files in .github/workflows
     schedule:
@@ -25,17 +21,41 @@ updates:
       interval: daily
     target-branch: dev
 
-#  - package-ecosystem: terraform
-#    directory: '/iac/app'
-#    schedule:
-#      interval: daily
-#    target-branch: dev
-#
-#  - package-ecosystem: terraform
-#    directory: '/iac/setup'
-#    schedule:
-#      interval: daily
-#    target-branch: dev
+  - package-ecosystem: github-actions
+    directory: '/' # Check files in .github/workflows
+    schedule:
+      interval: daily
+    target-branch: stg
+
+  - package-ecosystem: terraform
+    directory: '/iac/app'
+    schedule:
+      interval: daily
+    target-branch: stg
+
+  - package-ecosystem: terraform
+    directory: '/iac/setup'
+    schedule:
+      interval: daily
+    target-branch: stg
+
+  - package-ecosystem: github-actions
+    directory: '/' # Check files in .github/workflows
+    schedule:
+      interval: daily
+    target-branch: prd
+
+  - package-ecosystem: terraform
+    directory: '/iac/app'
+    schedule:
+      interval: daily
+    target-branch: prd
+
+  - package-ecosystem: terraform
+    directory: '/iac/setup'
+    schedule:
+      interval: daily
+    target-branch: prd
 
 # For each of these, requesting reviews from yourself makes Dependabot PRs easier to find (https://github.com/pulls/review-requested)
 #    reviewers:
