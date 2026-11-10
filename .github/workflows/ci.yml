@@ -101,6 +101,28 @@ jobs:
         working-directory: "./"
         run: tofu fmt -check -recursive
 
+  validate_setup:
+    name: OpenTofu Validate / Setup
+    timeout-minutes: 6
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: OpenTofu Setup
+        uses: opentofu/setup-opentofu@v2
+        with:
+          tofu_version: ${{ env.tofu_version }}
+
+      - name: OpenTofu Init
+        working-directory: iac/setup
+        run: tofu init -backend=false -input=false
+
+      - name: OpenTofu Validate
+        working-directory: iac/setup
+        run: tofu validate
+
   plan:
     name: Tofu Plan / ${{ matrix.env.environment_name }}
     timeout-minutes: 6
